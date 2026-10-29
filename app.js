@@ -468,17 +468,54 @@ setInterval(function () {
 
 // 只在主畫面 App 啟用；瀏覽器有原生的下拉重新整理
 // 頁面跟著手指往下移，燈號在空出來的位置
+// 彩蛋：拉到 SMASH_PX，燈號變成羽球，放手後羽球掉下來打在 Logo 上
 var PULL_PX = 100;
+var SMASH_PX = 180;
 var pull = { y0: null, d: 0, busy: false };
 var ptr = $('ptr');
 var wrap = document.querySelector('.wrap');
 
+// p：0～1 拉到觸發距離，超過 1 頁面再多移一點，讓人知道還能拉
 function setPull(p, settle) {
   wrap.style.transition = settle ? 'transform .25s' : '';
-  wrap.style.transform = p ? 'translateY(' + Math.round(p * 64) + 'px)' : '';
-  ptr.style.opacity = p;
+  wrap.style.transform = p ? 'translateY(' + Math.round(p <= 1 ? p * 64 : 64 + (p - 1) * 30) + 'px)' : '';
+  ptr.style.opacity = Math.min(p, 1);
+  ptr.classList.toggle('smash', p >= SMASH_PX / PULL_PX);
   [].forEach.call(ptr.querySelectorAll('i'), function (dot, i) {
     dot.classList.toggle('on', p >= (i + 1) / 3);
+  });
+}
+
+// 羽球從燈號的位置掉下來：翻成球頭朝下打在 Logo 上，頁面這時才彈回，羽球彈起再掉出畫面
+var SMASH_MS = 1100, HIT = .35;
+function smash() {
+  var from = ptr.getBoundingClientRect();
+  var brand = document.querySelector('.brand');
+  var b = brand.getBoundingClientRect();
+  var ball = ptr.querySelector('.ball').cloneNode(true);
+  ball.classList.add('fly');
+  document.body.appendChild(ball);
+  ptr.style.opacity = 0; // 換成飛出去的那顆
+  var x0 = from.left + from.width / 2, y0 = from.top + from.height / 2;
+  var hitX = Math.min(x0, b.right - 40) - x0;
+  var hitY = b.top - 12 - y0;
+  ball.style.left = x0 + 'px';
+  ball.style.top = y0 + 'px';
+  var at = function (x, y, r) { return 'translate(-50%, -50%) translate(' + x + 'px, ' + y + 'px) rotate(' + r + 'deg)'; };
+  var anim = ball.animate([
+    { transform: at(0, 0, 180), easing: 'cubic-bezier(.5, 0, 1, 1)' },
+    { transform: at(hitX, hitY, 0), offset: HIT, easing: 'cubic-bezier(0, 0, .3, 1)' },
+    { transform: at(hitX + 24, hitY - 70, -25), offset: .55, easing: 'cubic-bezier(.6, 0, 1, 1)' },
+    { transform: at(hitX + 70, window.innerHeight - y0 + 60, 15) }
+  ], { duration: SMASH_MS });
+  setTimeout(function () {
+    brand.classList.remove('hit');
+    void brand.offsetWidth; // 重新觸發動畫
+    brand.classList.add('hit');
+    setPull(0, true);
+  }, SMASH_MS * HIT);
+  return new Promise(function (done) {
+    anim.onfinish = function () { ball.remove(); done(); };
   });
 }
 
@@ -493,20 +530,22 @@ if (isStandalone) {
   document.addEventListener('touchmove', function (e) {
     if (pull.y0 === null) return;
     pull.d = Math.max(0, e.touches[0].clientY - pull.y0);
-    setPull(Math.min(pull.d / PULL_PX, 1));
+    setPull(Math.min(pull.d / PULL_PX, 2));
   }, { passive: true });
 
   document.addEventListener('touchend', function () {
     if (pull.y0 === null) return;
     pull.y0 = null;
     if (pull.d < PULL_PX) return setPull(0, true);
+    var smashed = pull.d >= SMASH_PX;
     pull.busy = true;
-    ptr.classList.add('spin');
-    load(false).then(function (ok) {
+    if (!smashed) ptr.classList.add('spin');
+    Promise.all([load(false), smashed && smash()]).then(function (r) {
+      var ok = r[0];
       pull.busy = false;
       ptr.classList.remove('spin');
       setPull(0, true);
-      if (ok) toast('已更新');
+      if (ok) toast(smashed ? '殺球！' : '已更新');
     });
   });
 }

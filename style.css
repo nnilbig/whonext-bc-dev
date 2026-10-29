@@ -311,4 +311,22 @@ button, input { font: inherit; }
   transform: translateX(-50%);
   pointer-events: none;
 }
+/* 彩蛋：用力拉，燈號變成羽球 */
+.ball {
+  width: 22px;
+  height: 31px;
+  fill: none;
+  stroke: var(--led);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(210, 228, 255, .8));
+}
+.ball .cork { fill: var(--led); }
+.ptr .ball { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0); transition: transform .15s; }
+.ptr i { transition: transform .15s; }
+.ptr.smash i { transform: scale(0); }
+.ptr.smash .ball { transform: translate(-50%, -50%) rotate(180deg); }
+.ball.fly { position: fixed; z-index: 9; pointer-events: none; }
+.brand.hit { animation: hit .3s; }
+@keyframes hit { 30% { transform: translateY(4px); } }
 [hidden] { display: none !important; }
