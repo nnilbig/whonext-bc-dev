@@ -4,7 +4,7 @@ var CONFIG = {
   appName: 'WHONEXT DEV', // iPhone 主畫面的名稱，與 manifest 的 short_name 相同
 
   // 測試版 GAS 的 /exec 網址
-  api: 'https://script.google.com/macros/s/測試版部署ID/exec',
+  api: 'https://script.google.com/macros/s/AKfycbwHGtpWl660Jf_YkABDARKGhjcCyGN2kC-9_t988E4uhcsHgxbjbuP-EnFmGQID2_8yRw/exec',
 
   // Firebase 主控台（whonext-bc-dev）→ 專案設定 → 一般 → 你的應用程式 → firebaseConfig
   firebase: {
