@@ -284,4 +284,24 @@ button, input { font: inherit; }
   line-height: 1;
   cursor: pointer;
 }
+/* 下拉重新整理：拉越多亮越多顆，放手後輪流亮；主畫面 App 關掉原生回彈，改由頁面位移 */
+@media (display-mode: standalone) {
+  html, body { overscroll-behavior-y: none; }
+}
+.ptr {
+  position: fixed;
+  top: calc(28px + env(safe-area-inset-top));
+  left: 50%;
+  z-index: 9;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.ptr i { width: 8px; height: 8px; border-radius: 50%; background: #333; }
+.ptr i.on { background: var(--led); box-shadow: 0 0 6px rgba(210, 228, 255, .8); }
+.ptr.spin i { background: var(--led); animation: led 1s infinite; }
+.ptr.spin i:nth-child(2) { animation-delay: .15s; }
+.ptr.spin i:nth-child(3) { animation-delay: .3s; }
 [hidden] { display: none !important; }
