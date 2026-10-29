@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>WHONEXT B.C. 報名平台</title>
+<meta property="og:title" content="WHONEXT B.C. 報名平台">
+<meta property="og:description" content="查看最新場次・即時名額，WHONEXT 羽球線上報名。">
+<meta property="og:url" content="https://nnilbig.github.io/wbc_signup/">
+<meta property="og:image" content="https://nnilbig.github.io/wbc_signup/og.png">
+<meta property="og:image:width" content="1080">
+<meta property="og:image:height" content="1080">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='9' fill='%23f4f8ff'/></svg>">
+<!-- 加到主畫面：名稱、圖示、全螢幕（名稱由 config.js 的 appName 覆寫） -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="WHONEXT">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+</head>
+<body>
+<!-- 背景：手繪塗鴉風的羽球場格線（13.4m × 6.1m，1m = 100 單位） -->
+<svg class="court" viewBox="-60 -60 730 1460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="rough1"><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency=".025" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="7"/></filter>
+    <g id="lines">
+      <rect x="0" y="0" width="610" height="1340"/>
+      <path d="M46 0V1340M564 0V1340"/>
+      <path d="M0 76H610M0 1264H610"/>
+      <path d="M0 472H610M0 868H610"/>
+      <path d="M305 0V472M305 868V1340"/>
+      <path d="M-30 670H640" stroke-dasharray="2 14" stroke-width="7"/>
+    </g>
+  </defs>
+  <g transform="rotate(-7 305 670)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+    <use href="#lines" filter="url(#rough1)" stroke-width="5"/>
+    <use href="#lines" filter="url(#rough2)" stroke-width="2" opacity=".6" transform="translate(4 -3)"/>
+  </g>
+</svg>
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <h1 class="brand">WHONEXT B.C.</h1>
+      <p class="sub">報名平台<span id="envTag" class="env" hidden>TEST</span></p>
+    </div>
+    <button id="pushBtn" class="bell" type="button" hidden></button>
+  </header>
+  <!-- 通知設定：按「開啟通知」後展開 -->
+  <section id="pushPanel" class="card push" hidden>
+    <h2 id="pushTitle">開啟通知</h2>
+    <p id="pushText">遞補成正取、新場次開放報名時，會通知這支手機。</p>
+    <input id="pushName" class="name" type="text" maxlength="20" autocomplete="nickname" enterkeyhint="done" placeholder="輸入姓名（與報名時相同）">
+    <div class="btns">
+      <button id="pushOk" class="btn primary" type="button">開啟通知</button>
+      <button id="pushOff" class="btn ghost" type="button">取消</button>
+    </div>
+  </section>
+  <!-- iPhone 在 Safari 開啟時：引導加到主畫面 -->
+  <section id="guide" class="card guide" hidden>
+    <button id="guideClose" class="x" type="button" aria-label="關閉">&times;</button>
+    <h2>加到主畫面，接收遞補通知</h2>
+    <ol>
+      <li>點 Safari 下方的「分享」<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M8 11H6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-2"/></svg></li>
+      <li>選「加入主畫面」<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></li>
+      <li>從主畫面的 <b id="guideApp">WHONEXT</b> 圖示打開，按右上角「開啟通知」</li>
+    </ol>
+  </section>
+  <section class="card info">
+    <h2>報名注意事項</h2>
+    <ol>
+      <li>點報名場次展開，輸入姓名後按「確認報名」。</li>
+      <li>報名額滿會自動排入候補。</li>
+      <li>有人取消時，最早的候補自動遞補，於群組通知。</li>
+      <li>「取消報名」點名單上的名字可直接帶入姓名，取消前請確認姓名正確。</li>
+    </ol>
+  </section>
+  <h2 class="title">選擇報名場次</h2>
+  <main id="list"><div class="state loading">LOADING</div></main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
