@@ -220,71 +220,54 @@ var isStandalone = navigator.standalone === true || window.matchMedia('(display-
 var pushReady = !!(CONFIG.firebase && CONFIG.vapidKey); // 這個環境有設定推播
 // iPhone 只有從主畫面打開時才有 PushManager，Safari 內會是 false
 var canPush = pushReady && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
-var push = { saved: loadPush(), panel: false, busy: false, pending: null };
+var push = { saved: loadPush(), busy: false }; // saved：這支裝置登記過的 { token }
 var messaging = null;
 
 function renderPush() {
   var on = isPushOn();
   var btn = $('pushBtn');
   btn.hidden = !canPush;
+  btn.disabled = push.busy;
   btn.className = 'bell' + (on ? ' on' : '');
-  btn.textContent = on ? '通知已開啟' : '開啟通知';
-  btn.setAttribute('aria-expanded', push.panel);
-
-  $('pushPanel').hidden = !push.panel;
-  if (!push.panel) return;
-  $('pushTitle').textContent = on ? '通知已開啟' : '開啟通知';
-  $('pushText').textContent = on
-    ? '通知對象：' + push.saved.name + '。可以修改姓名，或關閉這支手機的通知。'
-    : '遞補成正取、新場次開放報名時，會通知這支手機。請輸入報名時用的姓名。';
-  var ok = $('pushOk'), off = $('pushOff');
-  ok.disabled = off.disabled = push.busy;
-  ok.className = 'btn primary' + (push.pending === 'ok' ? ' loading' : '');
-  off.className = 'btn ghost' + (push.pending === 'off' ? ' loading' : '');
-  ok.innerHTML = push.pending === 'ok' ? loading('設定中') : on ? '更新姓名' : '開啟通知';
-  off.innerHTML = push.pending === 'off' ? loading('關閉中') : on ? '關閉通知' : '取消';
+  btn.textContent = push.busy ? '設定中…' : on ? '通知已開啟' : '開啟通知';
 }
 
 function isPushOn() {
   return canPush && !!push.saved && Notification.permission === 'granted';
 }
 
-function setPushBusy(which) {
-  push.busy = !!which;
-  push.pending = which || null;
+function setPushBusy(busy) {
+  push.busy = busy;
   renderPush();
 }
 
 function enablePush() {
-  var name = $('pushName').value.replace(/\s+/g, ' ').trim();
-  if (!name) { toast('請輸入姓名'); $('pushName').focus(); return; }
   // iPhone 只允許在按鈕的點擊中直接詢問權限，之前不能有任何非同步動作
   var perm = Notification.permission === 'default' ? Notification.requestPermission() : Promise.resolve(Notification.permission);
-  setPushBusy('ok');
+  setPushBusy(true);
   perm
     .then(function (p) {
       if (p !== 'granted') throw new Error(p === 'denied' ? '通知已被封鎖，請到手機設定開啟' : '尚未允許通知');
       return getToken();
     })
-    .then(function (token) { return subscribe(name, token); })
+    .then(subscribe)
     .then(function () {
-      push.panel = false;
-      setPushBusy(null);
+      setPushBusy(false);
       toast('通知已開啟');
     })
     .catch(function (err) {
-      setPushBusy(null);
+      setPushBusy(false);
       toast(err.message);
     });
 }
 
 function disablePush() {
-  setPushBusy('off');
+  if (!confirm('要關閉這支手機的通知嗎？')) return;
+  setPushBusy(true);
   api({ action: 'unsubscribe', token: push.saved.token })
     .then(function () {
       savePush(null);
-      push.panel = false;
-      setPushBusy(null);
+      setPushBusy(false);
       toast('通知已關閉');
       // 退訂這支裝置；之後再開啟會拿到新的 token
       navigator.serviceWorker.getRegistration()
@@ -293,14 +276,16 @@ function disablePush() {
         .catch(function () {});
     })
     .catch(function (err) {
-      setPushBusy(null);
+      setPushBusy(false);
       toast(err.message);
     });
 }
 
-function subscribe(name, token) {
-  return api({ action: 'subscribe', name: name, token: token, platform: platform() })
-    .then(function () { savePush({ token: token, name: name }); });
+// token 換新時帶上舊的，後端更新原本那列，不會多一列
+function subscribe(token) {
+  var old = push.saved && push.saved.token;
+  return api({ action: 'subscribe', token: token, oldToken: old && old !== token ? old : undefined, platform: platform() })
+    .then(function () { savePush({ token: token }); });
 }
 
 // 註冊 service worker → 向 Firebase 取得這支裝置的 token
@@ -338,7 +323,7 @@ function refreshPush() {
   if (Notification.permission !== 'granted') { savePush(null); return; } // 在系統設定關掉了
   getToken()
     .then(function (token) {
-      if (token !== push.saved.token) return subscribe(push.saved.name, token);
+      if (token !== push.saved.token) return subscribe(token);
     })
     .catch(function () {});
 }
@@ -349,24 +334,9 @@ function renderGuide() {
 }
 
 $('pushBtn').addEventListener('click', function () {
-  push.panel = !push.panel;
-  if (push.panel) $('pushName').value = isPushOn() ? push.saved.name : state.name;
-  renderPush();
-});
-
-$('pushOk').addEventListener('click', function () {
-  if (!push.busy) enablePush();
-});
-
-$('pushOff').addEventListener('click', function () {
   if (push.busy) return;
-  if (isPushOn()) return disablePush();
-  push.panel = false;
-  renderPush();
-});
-
-$('pushName').addEventListener('keydown', function (e) {
-  if (e.key === 'Enter') e.target.blur();
+  if (isPushOn()) disablePush();
+  else enablePush();
 });
 
 $('guideClose').addEventListener('click', function () {

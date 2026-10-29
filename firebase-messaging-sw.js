@@ -8,7 +8,7 @@ self.addEventListener('push', function (e) {
   var msg = {};
   try { msg = e.data ? e.data.json() : {}; } catch (err) {}
   var n = msg.notification || msg.data || {};
-  var title = n.title || 'WHONEXT B.C.';
+  var title = n.title || 'WHONEXT B.C. 通知';
   var body = n.body || '';
 
   e.waitUntil(Promise.all([
