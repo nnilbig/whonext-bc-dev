@@ -228,7 +228,7 @@ function renderPush() {
   var btn = $('pushBtn');
   btn.hidden = !canPush;
   btn.className = 'bell' + (on ? ' on' : '');
-  btn.textContent = on ? '關閉通知' : '開啟通知';
+  btn.textContent = on ? '通知已開啟' : '開啟通知';
   btn.setAttribute('aria-expanded', push.panel);
 
   $('pushPanel').hidden = !push.panel;
