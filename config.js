@@ -8,12 +8,12 @@ var CONFIG = {
 
   // Firebase 主控台（whonext-bc-dev）→ 專案設定 → 一般 → 你的應用程式 → firebaseConfig
   firebase: {
-    apiKey: '',
+    apiKey: 'AIzaSyCbeAI6wx4Jylfps2JHbttQRXh86xpoHp8',
     authDomain: 'whonext-bc-dev.firebaseapp.com',
     projectId: 'whonext-bc-dev',
-    storageBucket: 'whonext-bc-dev.appspot.com',
-    messagingSenderId: '',
-    appId: ''
+    storageBucket: 'whonext-bc-dev.firebasestorage.app',
+    messagingSenderId: '870804466450',
+    appId: '1:870804466450:web:8d8cf1b5bda360a1f521cb'
   },
 
   // Firebase 主控台 → 專案設定 → Cloud Messaging → 網路推播憑證 → 金鑰組（公鑰）
