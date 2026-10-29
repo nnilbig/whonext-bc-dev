@@ -17,5 +17,5 @@ var CONFIG = {
   },
 
   // Firebase 主控台 → 專案設定 → Cloud Messaging → 網路推播憑證 → 金鑰組（公鑰）
-  vapidKey: ''
+  vapidKey: 'BBBBfpbM__pFPvZz5yWjsLH7zXAPFjVCZH8NaHEHFP2E9j-tjz--ED_xn8amYG1Pie_70ItE77BioYxKqF-L7e0'
 };
