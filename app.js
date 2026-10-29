@@ -78,7 +78,7 @@ function call(fn, sid) {
     });
 }
 
-// 彩蛋：正取第一位是頭香；搶到最後一個名額時「剩餘 0」閃三下
+// 彩蛋：正取第一位是頭香；搶到最後一個名額時「剩餘 0」閃兩下
 function prize(sid, name) {
   var i = rank(sid, name);
   if (i < 0) return '';
