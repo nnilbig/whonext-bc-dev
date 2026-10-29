@@ -432,14 +432,14 @@ setInterval(function () {
 
 // 只在主畫面 App 啟用；瀏覽器有原生的下拉重新整理
 // 頁面跟著手指往下移，燈號在空出來的位置
-var PULL_PX = 70;
+var PULL_PX = 100;
 var pull = { y0: null, d: 0, busy: false };
 var ptr = $('ptr');
 var wrap = document.querySelector('.wrap');
 
 function setPull(p, settle) {
   wrap.style.transition = settle ? 'transform .25s' : '';
-  wrap.style.transform = p ? 'translateY(' + Math.round(p * 48) + 'px)' : '';
+  wrap.style.transform = p ? 'translateY(' + Math.round(p * 64) + 'px)' : '';
   ptr.style.opacity = p;
   [].forEach.call(ptr.querySelectorAll('i'), function (dot, i) {
     dot.classList.toggle('on', p >= (i + 1) / 3);
