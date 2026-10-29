@@ -132,7 +132,7 @@ button, input { font: inherit; }
 .num small { font-size: 20px; opacity: .55; text-shadow: none; }
 .cell.off .num { color: var(--dim); text-shadow: none; }
 .cell.off .num small { opacity: 1; }
-/* 搶到最後一位：剩餘 0 閃兩下 */
+/* 搶到頭香／最後一位：看板對應的格子閃兩下 */
 .cell.flash { animation: flash-cell .5s 2; }
 .cell.flash .num { animation: flash-num .5s 2; }
 @keyframes flash-cell { 50% { border-color: var(--warn); box-shadow: 0 0 14px rgba(255, 204, 51, .45); } }

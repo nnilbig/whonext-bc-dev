@@ -78,16 +78,19 @@ function call(fn, sid) {
     });
 }
 
-// 彩蛋：正取第一位是頭香；搶到最後一個名額時「剩餘 0」閃兩下
+// 彩蛋：正取第一位是頭香，「報名」閃兩下；搶到最後一個名額，「剩餘 0」閃兩下
 function prize(sid, name) {
   var i = rank(sid, name);
   if (i < 0) return '';
-  if (i === session(sid).cap - 1) {
-    var cell = list.querySelector('.card[data-sid="' + CSS.escape(sid) + '"] .cell:nth-child(2)');
-    if (cell) cell.classList.add('flash');
-    return '搶到最後一位！';
-  }
-  return i === 0 ? '搶到頭香！' : '';
+  if (i === session(sid).cap - 1) { flash(sid, 2); return '搶到最後一位！'; }
+  if (i === 0) { flash(sid, 1); return '搶到頭香！'; }
+  return '';
+}
+
+// 看板第 n 格（1 報名、2 剩餘、3 候補）
+function flash(sid, n) {
+  var cell = list.querySelector('.card[data-sid="' + CSS.escape(sid) + '"] .cell:nth-child(' + n + ')');
+  if (cell) cell.classList.add('flash');
 }
 
 function session(sid) {
